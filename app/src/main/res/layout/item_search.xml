@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="weather"
+            type="com.zeiris.cherryweather.data.model.Weather" />
+    </data>
+
+    <com.zeiris.cherryweather.ui.views.MaskedCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/card_side_margin"
+        android:layout_marginEnd="@dimen/card_side_margin"
+        android:layout_marginBottom="@dimen/card_bottom_margin"
+        app:cardElevation="@dimen/card_elevation"
+        app:cardPreventCornerOverlap="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/card_padding">
+
+            <TextView
+                android:id="@+id/item_weather_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{weather.name}"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:gravity="start"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/item_weather_country"
+                tools:text="Tokyo" />
+
+            <TextView
+                android:id="@+id/item_weather_country"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{weather.country}"
+                android:textAppearance="?attr/textAppearanceListItemSmall"
+                android:gravity="start"
+                android:minLines="1"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/item_weather_name"
+                app:layout_constraintBottom_toTopOf="@id/item_weather_sunset"
+                tools:text="Japan" />
+
+            <TextView
+                android:id="@+id/item_weather_sunset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{weather.sunset.toLocaleString()}"
+                android:textAppearance="?attr/textAppearanceListItemSecondary"
+                android:gravity="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/item_weather_country"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Oct 2, 2019 08:53:23" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.zeiris.cherryweather.ui.views.MaskedCardView>
+
+</layout>
