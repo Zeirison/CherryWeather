@@ -11,6 +11,9 @@ interface BaseDao<T> {
     @Delete
     fun delete(obj: T)
 
+    @Delete
+    fun delete(list: List<T>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(news: List<T>)
+    fun insertAll(list: List<T>)
 }

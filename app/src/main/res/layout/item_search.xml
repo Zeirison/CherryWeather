@@ -6,10 +6,6 @@
     <data>
 
         <variable
-            name="clickListener"
-            type="android.view.View.OnClickListener" />
-
-        <variable
             name="weather"
             type="com.zeiris.cherryweather.data.model.Weather" />
 
@@ -19,6 +15,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/weather_card"
         style="@style/Widget.MaterialComponents.CardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,6 +23,9 @@
         android:layout_marginTop="@dimen/card_spacing"
         android:layout_marginRight="@dimen/card_spacing"
         app:cardElevation="@dimen/card_elevation"
+        android:checkable="true"
+        android:longClickable="true"
+        app:checkedIcon="@null"
         app:cardPreventCornerOverlap="false"
         tools:ignore="PrivateResource">
 

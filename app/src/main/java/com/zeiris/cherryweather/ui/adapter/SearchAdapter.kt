@@ -1,9 +1,12 @@
 package com.zeiris.cherryweather.ui.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.ObservableArrayList
 import androidx.recyclerview.widget.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.card.MaterialCardView
 import com.zeiris.cherryweather.data.model.Weather
 import com.zeiris.cherryweather.databinding.ItemSearchBinding
 import com.zeiris.cherryweather.ui.maps.MapsActivity
@@ -18,8 +21,14 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
         )
     }
 
+    val checkedWeather: ObservableArrayList<Weather> = ObservableArrayList()
+
     fun updateWeatherList(list: List<Weather>) {
         listDiffer.submitList(list)
+    }
+
+    fun clearCheckedList() {
+        checkedWeather.clear()
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
@@ -37,34 +46,34 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
         )
     }
 
-    class SearchViewHolder(private val binding: ItemSearchBinding) :
+    inner class SearchViewHolder(private val binding: ItemSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Weather) {
             binding.apply {
                 weather = item
                 forecast = item.getNearestForecast()
+            }
 
-                weatherCard.setOnClickListener {
-                    if (weatherCard.isChecked) {
-                        weatherCard.isChecked = false
-                    } else {
-                        val temperature = item.getNearestForecast().main.getTempInCelsius()
-                        val latLng = LatLng(
-                            item.coordinates.lat,
-                            item.coordinates.lon
-                        )
-                        val options = MapsActivity.MarkerOptions(
-                            "${item.name} $temperature℃", latLng
-                        )
-                        MapsActivity.startActivity(weatherCard.context, options)
-                    }
+            val card = binding.weatherCard as MaterialCardView
+            card.setOnClickListener {
+                card.isChecked = checkedWeather.size > 0 && !card.isChecked
+
+                if (!card.isChecked && checkedWeather.size == 0) {
+                    openGoogleMaps(card.context, item)
                 }
 
-                weatherCard.setOnLongClickListener {
-                    weatherCard.isChecked = !weatherCard.isChecked
-                    true
+                if (!card.isChecked) {
+                    checkedWeather.remove(item)
                 }
+            }
+
+            card.setOnLongClickListener {
+                card.isChecked = !card.isChecked
+                if (card.isChecked) {
+                    checkedWeather.add(item)
+                }
+                true
             }
         }
 
@@ -86,6 +95,18 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
                 oldItem: Weather,
                 newItem: Weather
             ) = oldItem == newItem
+        }
+
+        fun openGoogleMaps(context: Context, weather: Weather) {
+            val temperature = weather.getNearestForecast().main.getTempInCelsius()
+            val latLng = LatLng(
+                weather.coordinates.lat,
+                weather.coordinates.lon
+            )
+            val options = MapsActivity.MarkerOptions(
+                "${weather.name} $temperature℃", latLng
+            )
+            MapsActivity.startActivity(context, options)
         }
     }
 

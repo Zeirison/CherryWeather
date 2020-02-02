@@ -4,37 +4,33 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.zeiris.cherryweather.databinding.FragmentSearchBinding
+import com.zeiris.cherryweather.R
 import com.zeiris.cherryweather.ui.adapter.SearchAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchFragment : Fragment() {
+class SearchActivity : AppCompatActivity() {
 
     private val viewModel: SearchViewModel by viewModel()
-    private val adapter = SearchAdapter()
-
+    private lateinit var adapter: SearchAdapter
     private lateinit var locationClient: FusedLocationProviderClient
 
     @SuppressLint("CheckResult")
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val binding = FragmentSearchBinding.inflate(inflater, container, false)
-        context ?: return binding.cities.rootView
-        binding.cities.adapter = adapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        adapter = SearchAdapter()
+        cities.layoutManager = LinearLayoutManager(this)
+        cities.adapter = adapter
 
         viewModel.fetchWeatherByCityId(1851632)
         viewModel.fetchWeatherByCityId(709930)
@@ -42,32 +38,37 @@ class SearchFragment : Fragment() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
+                progress_bar.visibility = View.GONE
                 adapter.updateWeatherList(it)
             }
 
-        return binding.cities.rootView
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         coordinate_search_button.setOnClickListener {
             checkLocation()
         }
+
+        card_remove_button.setOnClickListener {
+            viewModel.deleteWeather(adapter.checkedWeather).subscribe {
+                adapter.clearCheckedList()
+            }
+        }
     }
+
 
     private fun checkLocation() {
         val locationPermission = ContextCompat.checkSelfPermission(
-            this.requireContext(),
+            this,
             Manifest.permission.ACCESS_FINE_LOCATION
         )
 
         if (locationPermission == PackageManager.PERMISSION_GRANTED) {
-            locationClient = LocationServices.getFusedLocationProviderClient(this.requireContext())
+            locationClient = LocationServices.getFusedLocationProviderClient(this)
             locationClient.lastLocation.addOnSuccessListener {
+                progress_bar.visibility = View.VISIBLE
                 viewModel.fetchWeatherByCoordinates(it.latitude, it.longitude)
             }
         } else {
             ActivityCompat.requestPermissions(
-                this.requireActivity(),
+                this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_REQUEST_CODE
             )
@@ -88,10 +89,6 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-        @JvmStatic
-        fun newInstance() = SearchFragment()
-
         private const val LOCATION_REQUEST_CODE = 1
     }
-
 }

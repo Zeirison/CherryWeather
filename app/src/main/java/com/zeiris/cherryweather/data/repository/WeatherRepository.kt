@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.zeiris.cherryweather.data.db.dao.WeatherDao
 import com.zeiris.cherryweather.data.model.Weather
 import com.zeiris.cherryweather.data.remote.api.WeatherApi
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -20,6 +21,13 @@ class WeatherRepository(
 
     fun getWeather(): Observable<List<Weather>> {
         return weatherDao.getWeather()
+    }
+
+    @SuppressLint("CheckResult")
+    fun deleteWeather(list: List<Weather>): Completable {
+        return Completable.fromAction { weatherDao.delete(list) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
     }
 
     @SuppressLint("CheckResult")
