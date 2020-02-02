@@ -9,8 +9,8 @@ import io.reactivex.Observable
 @Dao
 interface WeatherDao : BaseDao<Weather> {
 
-    @Query("SELECT * FROM weather LIMIT :limit OFFSET :limit * (:page - 1)")
-    fun getWeather(page: Int, limit: Int): Observable<List<Weather>>
+    @Query("SELECT * FROM weather")
+    fun getWeather(): Observable<List<Weather>>
 
     @Query("SELECT * FROM weather WHERE id = :id")
     fun getWeatherByCityId(id: Int): Observable<Weather>

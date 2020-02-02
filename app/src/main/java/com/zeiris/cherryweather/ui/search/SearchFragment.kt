@@ -10,11 +10,12 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.observe
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.zeiris.cherryweather.databinding.FragmentSearchBinding
 import com.zeiris.cherryweather.ui.adapter.SearchAdapter
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_search.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -37,10 +38,12 @@ class SearchFragment : Fragment() {
 
         viewModel.fetchWeatherByCityId(1851632)
         viewModel.fetchWeatherByCityId(709930)
-
-        viewModel.weather.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
+        viewModel.weather
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                adapter.updateWeatherList(it)
+            }
 
         return binding.cities.rootView
     }

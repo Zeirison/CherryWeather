@@ -2,20 +2,29 @@ package com.zeiris.cherryweather.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.zeiris.cherryweather.data.model.Weather
 import com.zeiris.cherryweather.databinding.ItemSearchBinding
 
-class SearchAdapter : PagedListAdapter<Weather, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
+class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val weather = getItem(position)
-        weather?.let { (holder as SearchViewHolder).bind(it) }
+    private val listDiffer by lazy {
+        AsyncListDiffer<Weather>(
+            AdapterListUpdateCallback(this),
+            AsyncDifferConfig.Builder<Weather>(DIFF_CALLBACK).build()
+        )
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    fun updateWeatherList(list: List<Weather>) {
+        listDiffer.submitList(list)
+    }
+
+    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
+        val weather = getItem(position)
+        weather.let { holder.bind(it) }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         return SearchViewHolder(
             ItemSearchBinding.inflate(
                 LayoutInflater.from(parent.context),
@@ -36,6 +45,10 @@ class SearchAdapter : PagedListAdapter<Weather, RecyclerView.ViewHolder>(DIFF_CA
         }
 
     }
+
+    override fun getItemCount(): Int = listDiffer.currentList.count()
+
+    private fun getItem(position: Int): Weather = listDiffer.currentList[position]
 
     companion object {
         private val DIFF_CALLBACK = object :
