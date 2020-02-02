@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.zeiris.cherryweather.data.remote.deserializer.DateDeserializer
 import com.zeiris.cherryweather.data.remote.deserializer.WeatherDeserializer
 import java.util.*
+import kotlin.math.abs
+
 
 @Entity(tableName = "weather")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,4 +31,21 @@ data class Weather(
         val lat: Double,
         val lon: Double
     )
+
+    fun getNearestForecast(): Forecast {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MILLISECOND, -calendar.timeZone.getOffset(calendar.timeInMillis))
+        val date = calendar.time
+
+        var minDiff: Long = -1
+        var nearestForecast: Forecast = forecast[0]
+        for (fc in forecast) {
+            val diff: Long = abs(date.time - fc.date.time)
+            if (minDiff == -1L || diff < minDiff) {
+                minDiff = diff
+                nearestForecast = fc
+            }
+        }
+        return nearestForecast
+    }
 }

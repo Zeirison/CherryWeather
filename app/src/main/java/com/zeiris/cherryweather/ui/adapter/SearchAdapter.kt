@@ -40,7 +40,7 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
         fun bind(item: Weather) {
             binding.apply {
                 weather = item
-                executePendingBindings()
+                forecast = item.getNearestForecast()
             }
         }
 

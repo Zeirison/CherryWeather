@@ -12,6 +12,10 @@
         <variable
             name="weather"
             type="com.zeiris.cherryweather.data.model.Weather" />
+
+        <variable
+            name="forecast"
+            type="com.zeiris.cherryweather.data.model.Forecast" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -34,45 +38,70 @@
                 android:id="@+id/item_weather_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:gravity="start"
                 android:text="@{weather.name}"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:gravity="start"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/item_weather_temperature"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/item_weather_country"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Tokyo" />
 
             <TextView
-                android:id="@+id/item_weather_country"
+                android:id="@+id/item_weather_info"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{weather.country}"
-                android:textAppearance="?attr/textAppearanceListItemSmall"
-                android:gravity="start"
-                android:minLines="1"
-                android:maxLines="3"
                 android:ellipsize="end"
-                android:lineSpacingMultiplier="1"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@{forecast.getFormatWeather()}"
+                android:textSize="20sp"
+                android:textAppearance="?attr/textAppearanceListItem"
+                app:layout_constraintEnd_toStartOf="@+id/item_weather_temperature"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/item_weather_name"
-                app:layout_constraintBottom_toTopOf="@id/item_weather_sunset"
-                tools:text="Japan" />
+                app:layout_constraintTop_toBottomOf="@+id/item_weather_name"
+                tools:text="Clear (clear sky)" />
 
             <TextView
-                android:id="@+id/item_weather_sunset"
+                android:id="@+id/item_weather_temperature"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{weather.sunset.toLocaleString()}"
+                android:text="@{forecast.main.getTempInCelsius()}"
                 android:textAppearance="?attr/textAppearanceListItemSecondary"
-                android:gravity="end"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/item_weather_country"
+                android:textSize="60sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="Oct 2, 2019 08:53:23" />
+                app:layout_constraintEnd_toStartOf="@+id/item_weather_celsius"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="15" />
+
+            <TextView
+                android:id="@+id/item_weather_celsius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="\u2103"
+                android:textAppearance="?attr/textAppearanceListItemSecondary"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/item_weather_temperature" />
+
+            <TextView
+                android:id="@+id/item_weather_pressure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{forecast.main.getFormatPressure()}"
+                android:textAppearance="?attr/textAppearanceListItemSmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item_weather_info"
+                tools:text="Pressure: 157" />
+
+            <TextView
+                android:id="@+id/item_weather_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{forecast.main.getFormatHumidity()}"
+                android:textAppearance="?attr/textAppearanceListItemSmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item_weather_pressure"
+                tools:text="Humidity: 17%" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

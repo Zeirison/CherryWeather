@@ -27,7 +27,13 @@ data class Forecast(
         val feelsLike: Float,
         val pressure: Int,
         val humidity: Byte
-    )
+    ) {
+        fun getTempInCelsius() = ((temp - 273.15).toInt()).toString()
+
+        fun getFormatPressure() = "Pressure: $pressure"
+
+        fun getFormatHumidity() = "Humidity: ${humidity}%"
+    }
 
     data class Weather(
         val id: Int,
@@ -46,4 +52,5 @@ data class Forecast(
         val degree: Int
     )
 
+    fun getFormatWeather(): String = "${weather[0].main} (${weather[0].description})"
 }
