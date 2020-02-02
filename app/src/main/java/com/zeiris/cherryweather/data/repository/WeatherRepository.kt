@@ -29,7 +29,7 @@ class WeatherRepository(
     }
 
     @SuppressLint("CheckResult")
-    fun getWeatherByCityId(cityId: Int): Observable<Weather> {
+    fun fetchWeatherByCityId(cityId: Int) {
         weatherApi.getWeatherByCityId(cityId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -46,7 +46,26 @@ class WeatherRepository(
             }, { e ->
                 e.printStackTrace()
             })
-        return weatherDao.getWeatherByCityId(cityId)
+    }
+
+    @SuppressLint("CheckResult")
+    fun fetchWeatherByCoordinates(lat: Double, lon: Double) {
+        weatherApi.getWeatherByCoordinates(lat, lon)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ response ->
+                if (response.isSuccessful) {
+                    response.body()?.let { weather ->
+                        Observable.just(weatherDao)
+                            .subscribeOn(Schedulers.io())
+                            .subscribe { db ->
+                                db.insert(weather)
+                            }
+                    }
+                }
+            }, { e ->
+                e.printStackTrace()
+            })
     }
 
     private fun pagedListConfig() = PagedList.Config.Builder()

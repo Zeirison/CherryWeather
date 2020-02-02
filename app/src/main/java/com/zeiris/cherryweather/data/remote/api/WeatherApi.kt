@@ -15,8 +15,8 @@ interface WeatherApi {
 
     @GET("forecast")
     fun getWeatherByCoordinates(
-        @Query("lat") latitude: String,
-        @Query("lon") longitude: String
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double
     ): Observable<Response<Weather>>
 
 }
