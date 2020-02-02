@@ -63,6 +63,10 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
                     openGoogleMaps(card.context, item)
                 }
 
+                if (card.isChecked && checkedWeather.size > 0) {
+                    checkedWeather.add(item)
+                }
+
                 if (!card.isChecked) {
                     checkedWeather.remove(item)
                 }

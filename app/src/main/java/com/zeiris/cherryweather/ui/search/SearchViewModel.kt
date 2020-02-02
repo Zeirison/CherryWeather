@@ -7,7 +7,6 @@ import io.reactivex.Completable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-
 val searchViewModelModule = module {
     viewModel { SearchViewModel(get()) }
 }
@@ -24,12 +23,17 @@ class SearchViewModel(private val repo: WeatherRepository) : ViewModel() {
         repo.fetchWeatherByCityName(name)
     }
 
-    fun fetchWeatherByCityId(cityId: Int) {
+    fun fetchWeatherByCoordinates(lat: Double, lon: Double) {
+        repo.fetchWeatherByCoordinates(lat, lon)
+    }
+
+    private fun fetchWeatherByCityId(cityId: Int) {
         repo.fetchWeatherByCityId(cityId)
     }
 
-    fun fetchWeatherByCoordinates(lat: Double, lon: Double) {
-        repo.fetchWeatherByCoordinates(lat, lon)
+    fun fetchDummyCities() {
+        fetchWeatherByCityId(1851632)
+        fetchWeatherByCityId(709930)
     }
 
 }

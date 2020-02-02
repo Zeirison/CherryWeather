@@ -14,6 +14,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.zeiris.cherryweather.R
@@ -43,8 +44,7 @@ class SearchActivity : AppCompatActivity() {
             actionBar?.title = null
         }
 
-        viewModel.fetchWeatherByCityId(1851632)
-        viewModel.fetchWeatherByCityId(709930)
+        viewModel.fetchDummyCities()
         viewModel.weather
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -53,15 +53,7 @@ class SearchActivity : AppCompatActivity() {
                 adapter.updateWeatherList(it)
             }
 
-        coordinate_search_button.setOnClickListener {
-            checkLocation()
-        }
-
-        card_remove_button.setOnClickListener {
-            viewModel.deleteWeather(adapter.checkedWeather).subscribe {
-                adapter.clearCheckedList()
-            }
-        }
+        initFloatingButtonListeners()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -90,6 +82,30 @@ class SearchActivity : AppCompatActivity() {
         return true
     }
 
+    private fun initFloatingButtonListeners() {
+        cities.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0) {
+                    card_remove_button.hide()
+                    coordinate_search_button.hide()
+                } else if (dy < 0) {
+                    card_remove_button.show()
+                    coordinate_search_button.show()
+                }
+            }
+        })
+
+        coordinate_search_button.setOnClickListener {
+            checkLocation()
+        }
+
+        card_remove_button.setOnClickListener {
+            viewModel.deleteWeather(adapter.checkedWeather).subscribe {
+                adapter.clearCheckedList()
+            }
+        }
+    }
 
     private fun checkLocation() {
         val locationPermission = ContextCompat.checkSelfPermission(
