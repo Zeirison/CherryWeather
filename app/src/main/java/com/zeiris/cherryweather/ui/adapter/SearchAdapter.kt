@@ -3,8 +3,11 @@ package com.zeiris.cherryweather.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
+import com.google.android.gms.maps.model.LatLng
 import com.zeiris.cherryweather.data.model.Weather
 import com.zeiris.cherryweather.databinding.ItemSearchBinding
+import com.zeiris.cherryweather.ui.maps.MapsActivity
+
 
 class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
@@ -41,6 +44,27 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
             binding.apply {
                 weather = item
                 forecast = item.getNearestForecast()
+
+                weatherCard.setOnClickListener {
+                    if (weatherCard.isChecked) {
+                        weatherCard.isChecked = false
+                    } else {
+                        val temperature = item.getNearestForecast().main.getTempInCelsius()
+                        val latLng = LatLng(
+                            item.coordinates.lat,
+                            item.coordinates.lon
+                        )
+                        val options = MapsActivity.MarkerOptions(
+                            "${item.name} $temperature℃", latLng
+                        )
+                        MapsActivity.startActivity(weatherCard.context, options)
+                    }
+                }
+
+                weatherCard.setOnLongClickListener {
+                    weatherCard.isChecked = !weatherCard.isChecked
+                    true
+                }
             }
         }
 
