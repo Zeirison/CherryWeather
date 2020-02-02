@@ -2,10 +2,15 @@ package com.zeiris.cherryweather.ui.search
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.SearchManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,8 +20,9 @@ import com.zeiris.cherryweather.R
 import com.zeiris.cherryweather.ui.adapter.SearchAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_search.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class SearchActivity : AppCompatActivity() {
 
@@ -27,10 +33,15 @@ class SearchActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_search)
         adapter = SearchAdapter()
         cities.layoutManager = LinearLayoutManager(this)
         cities.adapter = adapter
+
+        if (supportActionBar != null) {
+            val actionBar: ActionBar? = supportActionBar
+            actionBar?.title = null
+        }
 
         viewModel.fetchWeatherByCityId(1851632)
         viewModel.fetchWeatherByCityId(709930)
@@ -51,6 +62,32 @@ class SearchActivity : AppCompatActivity() {
                 adapter.clearCheckedList()
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.search_menu, menu)
+
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.action_search).actionView as SearchView).apply {
+            this.maxWidth = Int.MAX_VALUE
+            this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    query?.let { viewModel.fetchWeatherByCityName(it) }
+                    this@apply.setQuery("", false)
+                    this@apply.clearFocus()
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    return true
+                }
+            })
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
+        }
+
+        return true
     }
 
 

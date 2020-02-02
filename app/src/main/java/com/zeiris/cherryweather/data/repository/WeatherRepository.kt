@@ -31,6 +31,26 @@ class WeatherRepository(
     }
 
     @SuppressLint("CheckResult")
+    fun fetchWeatherByCityName(name: String) {
+        weatherApi.getWeatherByCityName(name)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ response ->
+                if (response.isSuccessful) {
+                    response.body()?.let { weather ->
+                        Observable.just(weatherDao)
+                            .subscribeOn(Schedulers.io())
+                            .subscribe { db ->
+                                db.insert(weather)
+                            }
+                    }
+                }
+            }, { e ->
+                e.printStackTrace()
+            })
+    }
+
+    @SuppressLint("CheckResult")
     fun fetchWeatherByCityId(cityId: Int) {
         weatherApi.getWeatherByCityId(cityId)
             .subscribeOn(Schedulers.io())

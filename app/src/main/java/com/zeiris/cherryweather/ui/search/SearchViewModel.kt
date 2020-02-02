@@ -20,6 +20,10 @@ class SearchViewModel(private val repo: WeatherRepository) : ViewModel() {
         return repo.deleteWeather(list)
     }
 
+    fun fetchWeatherByCityName(name: String) {
+        repo.fetchWeatherByCityName(name)
+    }
+
     fun fetchWeatherByCityId(cityId: Int) {
         repo.fetchWeatherByCityId(cityId)
     }
