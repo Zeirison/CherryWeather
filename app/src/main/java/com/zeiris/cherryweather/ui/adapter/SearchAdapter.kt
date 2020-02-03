@@ -10,9 +10,11 @@ import com.google.android.material.card.MaterialCardView
 import com.zeiris.cherryweather.data.model.Weather
 import com.zeiris.cherryweather.databinding.ItemSearchBinding
 import com.zeiris.cherryweather.ui.maps.MapsActivity
+import com.zeiris.cherryweather.ui.search.OnListSizeChangedListener
 
 
-class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
+class SearchAdapter(private val listener: OnListSizeChangedListener) :
+    RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
     private val listDiffer by lazy {
         AsyncListDiffer<Weather>(
@@ -29,6 +31,11 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
     fun clearCheckedList() {
         checkedWeather.clear()
+        listSizeChanged()
+    }
+
+    private fun listSizeChanged() {
+        listener.onListChanged()
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
@@ -58,30 +65,38 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
             val card = binding.weatherCard as MaterialCardView
             card.isChecked = false
             card.setOnClickListener {
-                card.isChecked = checkedWeather.size > 0 && !card.isChecked
-
                 if (!card.isChecked && checkedWeather.size == 0) {
                     openGoogleMaps(card.context, item)
                 }
-
-                if (card.isChecked && checkedWeather.size > 0) {
-                    checkedWeather.add(item)
-                }
-
-                if (!card.isChecked) {
-                    checkedWeather.remove(item)
-                }
+                card.isChecked = changeCardState(card.isChecked, false, item)
             }
 
             card.setOnLongClickListener {
-                card.isChecked = !card.isChecked
-                if (card.isChecked) {
-                    checkedWeather.add(item)
-                }
+                card.isChecked = changeCardState(card.isChecked, true, item)
                 true
             }
         }
 
+    }
+
+    private fun changeCardState(isChecked: Boolean, isLong: Boolean, item: Weather): Boolean {
+        if (checkedWeather.size == 0 && !isLong) return false
+
+        if (!isChecked) {
+            checkedWeather.add(item)
+            listSizeChanged()
+            return true
+        }
+
+        if (!isChecked && checkedWeather.size > 0) {
+            checkedWeather.add(item)
+            listSizeChanged()
+            return true
+        }
+
+        checkedWeather.remove(item)
+        listSizeChanged()
+        return false
     }
 
     override fun getItemCount(): Int = listDiffer.currentList.count()

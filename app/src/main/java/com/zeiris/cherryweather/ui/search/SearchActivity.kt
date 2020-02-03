@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.activity_search.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), OnListSizeChangedListener {
 
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var adapter: SearchAdapter
@@ -35,7 +35,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        adapter = SearchAdapter()
+        adapter = SearchAdapter(this)
         cities.layoutManager = LinearLayoutManager(this)
         cities.adapter = adapter
 
@@ -51,9 +51,20 @@ class SearchActivity : AppCompatActivity() {
             .subscribe {
                 progress_bar.visibility = View.GONE
                 adapter.updateWeatherList(it)
+                changeNoCitiesVisibility(it.isEmpty())
             }
 
         initFloatingButtonListeners()
+    }
+
+    override fun onListChanged() {
+        if (adapter.checkedWeather.size > 0) {
+            card_remove_button.show()
+            coordinate_search_button.hide()
+        } else {
+            card_remove_button.hide()
+            coordinate_search_button.show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -82,6 +93,19 @@ class SearchActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_REQUEST_CODE &&
+            grantResults.contains(PackageManager.PERMISSION_GRANTED)
+        ) {
+            checkLocation()
+        }
+    }
+
     private fun initFloatingButtonListeners() {
         cities.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -90,8 +114,11 @@ class SearchActivity : AppCompatActivity() {
                     card_remove_button.hide()
                     coordinate_search_button.hide()
                 } else if (dy < 0) {
-                    card_remove_button.show()
-                    coordinate_search_button.show()
+                    if (adapter.checkedWeather.size > 0) {
+                        card_remove_button.show()
+                    } else {
+                        coordinate_search_button.show()
+                    }
                 }
             }
         })
@@ -128,16 +155,11 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_REQUEST_CODE &&
-            grantResults.contains(PackageManager.PERMISSION_GRANTED)
-        ) {
-            checkLocation()
+    private fun changeNoCitiesVisibility(isShow: Boolean) {
+        if (isShow) {
+            no_cities.visibility = View.VISIBLE
+        } else {
+            no_cities.visibility = View.GONE
         }
     }
 
