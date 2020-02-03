@@ -3,7 +3,6 @@ package com.zeiris.cherryweather.ui.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.ObservableArrayList
 import androidx.recyclerview.widget.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.card.MaterialCardView
@@ -23,7 +22,7 @@ class SearchAdapter(private val listener: OnListSizeChangedListener) :
         )
     }
 
-    val checkedWeather: ObservableArrayList<Weather> = ObservableArrayList()
+    val checkedWeather: ArrayList<Weather> = arrayListOf()
 
     fun updateWeatherList(list: List<Weather>) {
         listDiffer.submitList(list)

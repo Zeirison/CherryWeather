@@ -11,7 +11,7 @@ import io.reactivex.schedulers.Schedulers
 import org.koin.dsl.module
 
 val weatherRepoModule = module {
-    factory { WeatherRepository(get(), get()) }
+    single { WeatherRepository(get(), get()) }
 }
 
 class WeatherRepository(
@@ -23,7 +23,6 @@ class WeatherRepository(
         return weatherDao.getWeather()
     }
 
-    @SuppressLint("CheckResult")
     fun deleteWeather(list: List<Weather>): Completable {
         return Completable.fromAction { weatherDao.delete(list) }
             .subscribeOn(Schedulers.io())
@@ -85,6 +84,7 @@ class WeatherRepository(
                             }
                     }
                 }
+
             }, { e ->
                 e.printStackTrace()
             })
