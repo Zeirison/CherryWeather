@@ -32,8 +32,8 @@ class SearchViewModel(private val repo: WeatherRepository) : ViewModel() {
     }
 
     fun fetchDummyCities() {
-        fetchWeatherByCityId(1851632)
-        fetchWeatherByCityId(709930)
+        fetchWeatherByCityId(1851632) // Shuzenji
+        fetchWeatherByCityId(2260494) // Republic of the Congo
     }
 
 }
