@@ -12,15 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.zeiris.cherryweather.R
 import com.zeiris.cherryweather.ui.adapter.SearchAdapter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_search.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -30,7 +28,6 @@ class SearchActivity : AppCompatActivity(), OnListSizeChangedListener {
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var adapter: SearchAdapter
     private lateinit var locationClient: FusedLocationProviderClient
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,16 +42,12 @@ class SearchActivity : AppCompatActivity(), OnListSizeChangedListener {
         }
 
         viewModel.fetchDummyCities()
-        compositeDisposable.add(
-            viewModel.weather
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    progress_bar.visibility = View.GONE
-                    adapter.updateWeatherList(it)
-                    changeNoCitiesVisibility(it.isEmpty())
-                }
-        )
+        viewModel.fetchSavedCities()
+        viewModel.weather.observe(this) {
+            progress_bar.visibility = View.GONE
+            adapter.updateWeatherList(it)
+            changeNoCitiesVisibility(it.isEmpty())
+        }
 
         initFloatingButtonListeners()
     }
@@ -110,7 +103,7 @@ class SearchActivity : AppCompatActivity(), OnListSizeChangedListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        compositeDisposable.dispose()
+        viewModel.compositeDisposable.dispose()
     }
 
     private fun initFloatingButtonListeners() {
