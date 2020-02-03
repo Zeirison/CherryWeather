@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.fragment.app.FragmentActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -15,18 +15,30 @@ import com.zeiris.cherryweather.R
 import kotlinx.android.parcel.Parcelize
 
 
-class MapsActivity : FragmentActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var options: MarkerOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         options = intent.getParcelableExtra(EXTRA_MAP_OPTIONS)
+        supportActionBar?.title = options.title
 
         val mapFragment: SupportMapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(0, 0) // To fix activity blinking
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {

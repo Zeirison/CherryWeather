@@ -1,4 +1,4 @@
-package com.zeiris.cherryweather.ui
+package com.zeiris.cherryweather.di
 
 import com.google.auto.service.AutoService
 import com.zeiris.cherryweather.ui.search.searchViewModelModule

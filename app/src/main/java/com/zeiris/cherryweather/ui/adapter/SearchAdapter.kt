@@ -56,6 +56,7 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
             }
 
             val card = binding.weatherCard as MaterialCardView
+            card.isChecked = false
             card.setOnClickListener {
                 card.isChecked = checkedWeather.size > 0 && !card.isChecked
 

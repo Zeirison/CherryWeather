@@ -1,4 +1,4 @@
-package com.zeiris.cherryweather.data
+package com.zeiris.cherryweather.di
 
 import com.google.auto.service.AutoService
 import com.zeiris.cherryweather.data.db.databaseModule
